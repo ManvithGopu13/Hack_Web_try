@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const passport = require("passport");
+const session = require('express-session');
+
 
 const app = express();
 
@@ -9,8 +12,28 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+const authRoutes = require("./routes/authRoutes");
+
+// Passport config
+require("./config/passport-config")(passport);
+
+// Session middleware
+app.use(
+  session({
+    secret: '86485824e5de4935d285cbe3616ee00d56f07179832483f7d04a09694baba93e9538c31b66286eb0f50062c27bc164cdaa75a48bb6b6aacc23d243245fea721d',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use("/api/authentication", authRoutes);
+
 // MongoDB Configuration
-const mongoURI = 'mongodb://0.0.0.0:27017/dataviz'; // Replace with your MongoDB connection URL
+const mongoURI = 'mongodb+srv://21je0110:21je0110@cluster0.39gch.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; // Replace with your MongoDB connection URL
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
